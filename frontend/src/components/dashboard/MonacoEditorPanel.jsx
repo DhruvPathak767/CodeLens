@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import Editor from '@monaco-editor/react'
+import '@/lib/monaco'
 import { Select } from '@/components/ui/Select'
 import { ScanLineEffect } from '@/components/common/ScanLineEffect'
 import { LANGUAGES } from '@/utils/constants'
@@ -52,4 +53,3 @@ export function MonacoEditorPanel({ code, onChange, language, onLanguageChange, 
     </motion.div>
   )
 }
-
