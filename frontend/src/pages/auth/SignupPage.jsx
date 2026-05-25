@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, ArrowRight } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { GlowButton } from '@/components/common/GlowButton'
 import { AuthPanel } from '@/components/auth/AuthPanel'
+import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
 import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
 
@@ -17,42 +18,11 @@ export default function SignupPage() {
   const { signup, googleLogin } = useAuth()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    // Dynamically load Google GSI SDK script
-    const script = document.createElement('script')
-    script.src = 'https://accounts.google.com/gsi/client'
-    script.async = true
-    script.defer = true
-    script.onload = () => {
-      if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '1068228228308-g92j0v0l8k8k8k8.apps.googleusercontent.com',
-          callback: handleGoogleCallback,
-          auto_select: false,
-        })
-        window.google.accounts.id.renderButton(
-          document.getElementById('google-signup-btn-div'),
-          { 
-            theme: 'filled_black', 
-            size: 'large', 
-            width: '280', 
-            text: 'continue_with',
-            shape: 'rectangular',
-          }
-        )
-      }
-    }
-    document.body.appendChild(script)
-    return () => {
-      document.body.removeChild(script)
-    }
-  }, [])
-
-  const handleGoogleCallback = async (response) => {
-    if (!response.credential) return
+  const handleGoogleCredential = async (credential) => {
+    if (!credential) return
     setLoading(true)
     try {
-      await googleLogin(response.credential)
+      await googleLogin(credential)
       toast.success('Signed in via Google successfully!')
       navigate('/dashboard')
     } catch (err) {
@@ -129,7 +99,9 @@ export default function SignupPage() {
         <div className="relative w-full max-w-[280px] flex justify-center group">
           {/* Subtle neon glow behind the button */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg blur opacity-40 group-hover:opacity-60 transition-opacity pointer-events-none" />
-          <div id="google-signup-btn-div" className="w-full relative z-10"></div>
+          <div className="w-full relative z-10">
+            <GoogleAuthButton onCredential={handleGoogleCredential} disabled={loading} />
+          </div>
         </div>
       </div>
     </AuthPanel>
