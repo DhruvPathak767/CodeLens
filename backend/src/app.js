@@ -12,8 +12,23 @@ const { sendError } = require("./utils/apiResponse");
 
 const app = express();
 
-// 1. Security Headers (Helmet)
-app.use(helmet());
+// 1. Security Headers (Helmet) - Configured with CSP rules to support Google Sign-in (GSI)
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "script-src": ["'self'", "'unsafe-inline'", "https://accounts.google.com/gsi/client"],
+        "connect-src": ["'self'", "https://accounts.google.com/gsi/", "https://oauth2.googleapis.com"],
+        "frame-src": ["'self'", "https://accounts.google.com/gsi/"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://accounts.google.com/gsi/style", "https://fonts.googleapis.com"],
+        "font-src": ["'self'", "https://fonts.gstatic.com", "https://fonts.googleapis.com", "data:"],
+        "img-src": ["'self'", "data:", "https://lh3.googleusercontent.com"],
+      },
+    },
+  })
+);
+
 
 // 2. CORS configuration (Production-Ready)
 const allowedOrigin = process.env.CLIENT_URL || "http://localhost:5173";
