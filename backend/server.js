@@ -2,7 +2,6 @@
 require("dotenv").config();
 
 const express = require("express");
-const path = require("path");
 
 const app = require("./src/app");
 const connectDB = require("./src/config/db");
@@ -12,22 +11,6 @@ connectDB();
 
 // JSON Middleware
 app.use(express.json());
-
-// Frontend Build Path
-const frontendPath = path.resolve(
-  __dirname,
-  "../frontend/dist"
-);
-
-// Serve React Frontend
-app.use(express.static(frontendPath));
-
-// React Catch-All Route. Express 5 no longer accepts a bare "*" path.
-app.get(/.*/, (req, res) => {
-  res.sendFile(
-    path.join(frontendPath, "index.html")
-  );
-});
 
 // Handle Uncaught Exceptions
 process.on("uncaughtException", (err) => {

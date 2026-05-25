@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
@@ -68,12 +69,20 @@ app.use("/api/snippets", snippetRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/settings", settingsRoutes);
 
-// 7. Route Not Found (404) Handler
-app.use((req, res, next) => {
+// 7. Serve built React frontend on the same Railway service.
+const frontendPath = path.resolve(__dirname, "../../frontend/dist");
+app.use(express.static(frontendPath));
+
+app.get(/^\/(?!api(?:\/|$)).*/, (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
+// 8. API Route Not Found (404) Handler
+app.use("/api", (req, res, next) => {
   return sendError(res, 404, `Requested API path not found: ${req.originalUrl}`);
 });
 
-// 8. Global Centralized Error Middleware
+// 9. Global Centralized Error Middleware
 app.use(errorHandler);
 
 module.exports = app;
